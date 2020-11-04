@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func main() {
 	var (
 		harrypotter = book{"Harry Potter", 500}
@@ -17,5 +19,8 @@ func main() {
 	var store list
 	store = append(store, &pubg, &cod, mahabarth, harrypotter, rubics)
 	store.print()
+
+	// Interface values are comparable: Eg
+	fmt.Println(store[0] == &pubg)
 
 }
