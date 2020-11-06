@@ -14,7 +14,8 @@ func TestNewDeck(t *testing.T) { // t is test handler
 	}
 
 	if d[len(d)-1] != "Four of Clubes" {
-		t.Errorf("Expected last card of Four of Clubes , but got %v", d[0])
+		t.Errorf("Expected last card of Four of Clubes , but got %v", d[len(d)-1])
 
 	}
+
 }
