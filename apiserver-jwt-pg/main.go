@@ -20,6 +20,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/davecgh/go-spew/spew"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
@@ -115,8 +117,55 @@ func signup(w http.ResponseWriter, r *http.Request) {
 
 //////////////////////////////////////////////////////
 
+func generateToken(user User) (string, error) {
+	var err error
+	secret := "anytextprajirko"
+	//header.payload.secret
+	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
+		"email": user.Email,
+		"iss":   "course",
+	})
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return tokenString, nil
+
+}
+
 func login(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("login invoked")
+	var user User
+	//var jwt JWT
+	var error Error
+
+	json.NewDecoder(r.Body).Decode(&user)
+	if user.Email == "" {
+		error.Message = "Email is missing"
+		respondWithError(w, http.StatusBadRequest, error)
+		return
+	}
+
+	if user.Password == "" {
+		error.Message = "Password is missing"
+		respondWithError(w, http.StatusBadRequest, error)
+		return
+	}
+
+	//password := user.Password
+	row := db.QueryRow("select * from users where email=$1", user.Email)
+	err := row.Scan(&user.ID, &user.Email, &user.Password)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			error.Message = "The user does not exist"
+			respondWithError(w, http.StatusBadRequest, error)
+			return
+		} else {
+			log.Fatal(err)
+		}
+	}
+
+	spew.Dump(user)
 
 }
 
